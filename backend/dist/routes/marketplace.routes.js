@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const marketplaceController_1 = require("../controllers/marketplaceController");
+const auth_1 = require("../middleware/auth");
+const marketplaceRouter = (0, express_1.Router)();
+marketplaceRouter.get('/products', marketplaceController_1.listProducts);
+marketplaceRouter.get('/products/:productId', marketplaceController_1.getProductById);
+marketplaceRouter.post('/products', auth_1.requireAuth, (0, auth_1.requireRole)(['vendor', 'admin']), marketplaceController_1.createProduct);
+marketplaceRouter.patch('/products/:productId', auth_1.requireAuth, (0, auth_1.requireRole)(['vendor', 'admin']), marketplaceController_1.updateProduct);
+marketplaceRouter.delete('/products/:productId', auth_1.requireAuth, (0, auth_1.requireRole)(['vendor', 'admin']), marketplaceController_1.deleteProduct);
+marketplaceRouter.get('/cart', auth_1.requireAuth, marketplaceController_1.getCart);
+marketplaceRouter.post('/cart', auth_1.requireAuth, marketplaceController_1.addToCart);
+marketplaceRouter.delete('/cart/:productId', auth_1.requireAuth, marketplaceController_1.removeFromCart);
+marketplaceRouter.post('/checkout', auth_1.requireAuth, marketplaceController_1.checkout);
+marketplaceRouter.get('/orders', auth_1.requireAuth, marketplaceController_1.listOrders);
+marketplaceRouter.get('/orders/:orderId', auth_1.requireAuth, marketplaceController_1.getOrderById);
+marketplaceRouter.post('/reviews', auth_1.requireAuth, marketplaceController_1.createReview);
+marketplaceRouter.get('/reviews/:productId', marketplaceController_1.listReviewsByProduct);
+marketplaceRouter.get('/recommendations', auth_1.requireAuth, marketplaceController_1.getRecommendations);
+exports.default = marketplaceRouter;
+//# sourceMappingURL=marketplace.routes.js.map

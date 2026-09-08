@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: b2b-marketplace-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: b2b_marketplace
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: b2b-marketplace-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://mongodb:27017/b2b_marketplace
+      JWT_ACCESS_SECRET: change_me_access_secret
+      JWT_REFRESH_SECRET: change_me_refresh_secret
+      CORS_ORIGINS: http://localhost:80,http://frontend
+      FRONTEND_URL: http://localhost
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: b2b-marketplace-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: /api
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  mongo_data:
