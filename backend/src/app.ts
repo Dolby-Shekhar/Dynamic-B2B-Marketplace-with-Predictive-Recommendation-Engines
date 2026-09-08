@@ -22,7 +22,9 @@ app.use(
     origin: (origin, callback) => {
       const normalizedOrigin = origin?.replace(/\/$/, '') ?? '';
       const allowlist = env.corsOrigins.map((value) => value.replace(/\/$/, ''));
-      const isLocalDevOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin);
+      const isLocalDevOrigin =
+            /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin) ||
+            /^https?:\/\/(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})(:\d+)?$/.test(normalizedOrigin);
 
       if (!origin) {
         callback(null, true);
