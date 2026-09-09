@@ -14,6 +14,12 @@ const app = express();
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'img-src': ["'self'", 'data:', 'https://images.unsplash.com'],
+      },
+    },
   }),
 );
 
