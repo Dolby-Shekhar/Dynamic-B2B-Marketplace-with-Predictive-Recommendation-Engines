@@ -4,7 +4,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
-
+import path from 'path';
 import { env } from './config/env';
 import apiRouter from './routes';
 import { AppError } from './utils/AppError';
@@ -68,7 +68,16 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api', apiRouter);
+const frontendDist = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(frontendDist));
 
+app.use((req, res, next) => {
+  if (req.method !== 'GET' || req.path.startsWith('/api')) {
+    next();
+    return;
+  }
+  res.sendFile(path.join(frontendDist, 'index.html'));
+});
 app.use((req, res) => {
   res.status(404).json({
     success: false,
